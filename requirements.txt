@@ -1,0 +1,12 @@
+pandas
+numpy
+urllib2
+BeautifulSoup
+unidecode
+tqdm
+string
+nltk
+collections
+wordcloud
+matplotlib
+sys
