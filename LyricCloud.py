@@ -60,14 +60,19 @@ class LyricCloud(object):
 				song_pos = ((len(billboard_data))%100)+1
 				curr_row.extend([song_pos,year])
 				cells = row.findChildren('td')
+		
 				for cell in cells:
 					text = unidecode(cell.text).replace("\n","").replace("\"","")
-					curr_row.append(text)
-					#Hack to make wiki tables <1982 work correctly
-					if len(curr_row) == 5:
+					curr_row.append(text)							
+					if len(curr_row)==4 and year >=1982:
+						#Create Main_Artist feature
+						curr_row.append(text.split("featuring", 1)[0].rstrip())
+						#Add new row to data
+						billboard_data.append(curr_row)
+
+					#Ugly hack to make tables <1982 work properly
+					elif len(curr_row)==5 and year <1982:
 						del curr_row[2]
-							
-					if len(curr_row)==4:
 						#Create Main_Artist feature
 						curr_row.append(text.split("featuring", 1)[0].rstrip())
 						#Add new row to data
@@ -111,7 +116,7 @@ class LyricCloud(object):
 	def generate_world_cloud(self):
 		#Join all lyrics into single string
 		all_lyrics =""
-		for i in range(0,self.dataframe.shape[0]):
+		for i in trange(0,self.dataframe.shape[0],desc="Generating image.."):
 			#Replace new space and eliminate punctuation
 			all_lyrics=all_lyrics+" "+(self.dataframe.loc[i,'Lyrics'].replace("\n",""))
 			for p in string.punctuation:
@@ -142,7 +147,24 @@ class LyricCloud(object):
 
 
 if __name__ == '__main__':
-	lc = LyricCloud(sys.argv[1],sys.argv[2])
-	lc.get_song_data()
-	lc.get_song_lyrics()
-	lc.generate_world_cloud()
+
+	if len(sys.argv) ==5:
+		bb_mode = sys.argv[4]
+	else :
+		bb_mode = 'decade'
+
+	if sys.argv[1] == 'bb':
+		if bb_mode == 'yearly':
+			for i in range(int(sys.argv[2]),int(sys.argv[3])+1):
+				lc = LyricCloud(i,i)
+				lc.get_song_data()
+				lc.get_song_lyrics()
+				lc.generate_world_cloud()
+		else :
+			lc = LyricCloud(sys.argv[2],sys.argv[3])
+			lc.get_song_data()
+			lc.get_song_lyrics()
+			lc.generate_world_cloud()
+
+	elif sys.argv[1] == 'band':
+		print("Not implemented yet")
