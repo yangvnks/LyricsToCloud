@@ -138,9 +138,9 @@ class LyricCloud(object):
 
 
 		if self.start_year == self.end_year:
-			wordcloud.to_file('results/LyricCloud'+'_'+str(self.start_year)+'.png')
+			wordcloud.to_file('LyricCloud'+'_'+str(self.start_year)+'.png')
 		else:
-			wordcloud.to_file('results/LyricCloud'+'_'+str(self.start_year)+'_'+str(self.end_year)+'.png')
+			wordcloud.to_file('LyricCloud'+'_'+str(self.start_year)+'_'+str(self.end_year)+'.png')
 
 
 
