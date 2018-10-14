@@ -151,7 +151,7 @@ if __name__ == '__main__':
 	if len(sys.argv) ==5:
 		bb_mode = sys.argv[4]
 	else :
-		bb_mode = 'decade'
+		bb_mode = 'timespan'
 
 	if sys.argv[1] == 'bb':
 		if bb_mode == 'yearly':
