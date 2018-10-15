@@ -5,9 +5,8 @@ from bs4 import BeautifulSoup
 from unidecode import unidecode
 from tqdm import trange
 import string
-from nltk.corpus import stopwords
 from collections import Counter
-from wordcloud import WordCloud
+from wordcloud import WordCloud, STOPWORDS
 import matplotlib.pyplot as plt
 import sys
 
@@ -123,9 +122,8 @@ class LyricCloud(object):
 				all_lyrics = all_lyrics.replace(p,'')
 
 			
-		#Filter stopwords from lyrics
-		sw=stopwords.words('english')
-		filtered_lyrics = ' '.join([word for word in all_lyrics.split() if word not in sw])
+		# #Filter stopwords from lyrics
+		sw = set(STOPWORDS)
 
 		
 		# Generate world cloud
@@ -133,8 +131,9 @@ class LyricCloud(object):
 							  width=self.width,
 							  background_color=self.bgc,
 							  colormap =self.colormap,
+							  stopwords = sw,
 							  relative_scaling=0.9,
-							).generate(filtered_lyrics)
+							).generate(all_lyrics)
 
 
 		if self.start_year == self.end_year:
