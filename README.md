@@ -4,6 +4,12 @@ LyricsToCloud is a tool that generates a word cloud using lyrics from Billboard 
 * User specified
 
 
+## Configuration
+* Use the Config.ini file to update the fields you want. 
+* 'Font_path' MUST be updated as the default only works on Linux machines.
+* 'Font_colors' are matplotlib colormaps whose values can be found online ( see link in Config.ini )
+* 'Background' takes a default color value ( see link in Config.ini)
+
 ## Usage
 * Using Billboard Top 100 End of the Year songs:
 
