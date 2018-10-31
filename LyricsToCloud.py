@@ -7,8 +7,10 @@ from tqdm import trange
 import string
 from collections import Counter
 from wordcloud import WordCloud, STOPWORDS
-import matplotlib.pyplot as plt
 import sys
+import os
+import configparser
+
 
 
 SITE_BB = 'https://en.wikipedia.org/wiki/Billboard_Year-End_Hot_100_singles_of_'
@@ -16,20 +18,15 @@ SITE_LY = "http://lyrics.wikia.com/wiki/"
 REQ_HDR = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
 			   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
 			  }
-MIN_YR = 1960
-MAX_YR = 2017
+
 
 
 class LyricCloud(object):
-	def __init__(self,start_year,end_year,decade=False,width=960,height=540,colormap="plasma",bgc ="white"):
+	def __init__(self,start_year,end_year):
 		self.start_year = int(start_year)
 		self.end_year = int(end_year)
-		self.decade = decade
-		self.height=height
-		self.width=width
-		self.colormap=colormap
-		self.bgc=bgc
-		if self.start_year < MIN_YR or self.end_year > MAX_YR:
+		self.load_configurations()
+		if self.start_year < self._MIN_YR or self.end_year > self._MAX_YR:
 			raise ValueError("\nYear must be greater or equal to 1960 and lower or equal to 2017.\nYour input :{}-{} \n" .format(self.start_year,self.end_year))
 		if self.start_year > self.end_year:
 			temp=self.start_year
@@ -37,12 +34,8 @@ class LyricCloud(object):
 			self.end_year = temp
 
 
-		if self.decade:
-			self.end_year = self.start_year+10 if self.start_year+10 <= 2017 else 2017
-
-		
-
 	def get_song_data(self):
+
 		billboard_data=[]
 		for year in trange(self.start_year, self.end_year+1,desc='Getting songs...'):
 			response = urllib2.urlopen(SITE_BB + str(year))
@@ -113,6 +106,8 @@ class LyricCloud(object):
 
 
 	def generate_world_cloud(self):
+
+
 		#Join all lyrics into single string
 		all_lyrics =""
 		for i in trange(0,self.dataframe.shape[0],desc="Generating image.."):
@@ -127,12 +122,13 @@ class LyricCloud(object):
 
 		
 		# Generate world cloud
-		wordcloud = WordCloud(height=self.height,
-							  width=self.width,
-							  background_color=self.bgc,
-							  colormap =self.colormap,
+		wordcloud = WordCloud(font_path = self._FONT_PATH,
+							  height=self._HEIGHT,
+							  width=self._WIDTH,
+							  background_color=self._BGC,
+							  colormap =self._FONT_COLOR,
 							  stopwords = sw,
-							  relative_scaling=0.9,
+							  relative_scaling=self._RELATIVE_SCALING,
 							).generate(all_lyrics)
 
 
@@ -140,6 +136,23 @@ class LyricCloud(object):
 			wordcloud.to_file('LyricCloud'+'_'+str(self.start_year)+'.png')
 		else:
 			wordcloud.to_file('LyricCloud'+'_'+str(self.start_year)+'_'+str(self.end_year)+'.png')
+
+
+	def load_configurations(self):
+		#Get file configurations
+		config = configparser.ConfigParser()
+		config.read('Config.ini')
+		self._FONT_PATH =  config['IMAGE']['Font_path']
+		if not os.path.exists(self._FONT_PATH):
+			print("Impossible loading your font. Set to default.")
+			self._FONT_PATH = None;
+		self._RELATIVE_SCALING = float(config['IMAGE']['Relative_scaling'])
+		self._FONT_COLOR = config['IMAGE']['Font_color']
+		self._HEIGHT = int(config['IMAGE']['Height'])
+		self._WIDTH = int(config['IMAGE']['Width'])
+		self._BGC = config['IMAGE']['Background']
+		self._MIN_YR =int(config['YEAR']['Min_year'])
+		self._MAX_YR =int(config['YEAR']['Max_year'])
 
 
 
