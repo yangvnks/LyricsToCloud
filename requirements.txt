@@ -9,3 +9,5 @@ collections
 wordcloud
 matplotlib
 sys
+os
+configparser
